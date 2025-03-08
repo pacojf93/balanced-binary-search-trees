@@ -4,7 +4,86 @@ const Node = (data = null, left = null, right = null) => ({
   right,
 });
 
-const Tree = (array) => ({root: buildTree(array)})
+const Tree = (array) => {
+    const buildTree = (array) => {
+        if (!array.length) return null
+        const rootIndex = Math.floor(array.length / 2)
+        const root = Node(array[rootIndex])
+        root.left = buildTree(array.slice(0,rootIndex))
+        root.right = buildTree(array.slice(rootIndex+1))
+        return root
+    }
+
+    const insert = (value) => 
+        (insertRec = function (node) {
+            if (value === node.data) return
+            if (value > node.data) {
+                if (node.right === null) node.right = Node(value)
+                else insertRec(node.right)
+            } else {
+                if (node.left === null) node.left = Node(value)
+                else insertRec(node.left)
+            }
+        })(root)
+
+    const deleteItem = (value) => 
+        (deleteItemRec = function (node, value) {
+/*             if (node.data === value ) {
+                if(node.right !== null) {
+                    node.data = node.right.data
+                    deleteItemRec(node, node.data)
+                } else {
+                    node = null
+                    return
+                }
+            } */
+            if (node.left !== null) {
+                if (node.left.data === value ) {
+                    if(node.left.right !== null) {
+                        node.left.data = node.left.right.data
+                        deleteItemRec(node.left, node.left.data)
+                    } else {
+                        node.left = null
+                        return
+                    }
+                }
+            }
+            if (node.right !== null) {
+                if (node.right.data === value ) {
+                    if(node.right.right !== null) {
+                        node.right.data = node.right.right.data
+                        deleteItemRec(node.right, node.right.data)
+                    } else {
+                        node.right = null
+                        return
+                    }
+                }
+            }
+            if (value > node.data) {
+                if (node.right === null) return
+                else deleteItemRec(node.right, value)
+            } else {
+                if (node.left === null) return
+                else deleteItemRec(node.left, value)
+            }
+        })(root, value)
+
+    const find = value => 
+        (findRec = function (node) {
+            if (value === node.data) return node
+            if (value > node.data) return node.right === null ? null : findRec(node.right)
+            else return node.left === null ? null : findRec(node.left)
+        })(root)
+
+    const root = buildTree(array)
+
+    return {
+        root,
+        insert,
+        deleteItem,
+        find
+    }
+}
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
     if (node === null) {
@@ -21,25 +100,20 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 
 const sortAndRemoveDuplicates = (array) => [...new Set(array)].sort((a, b) => a - b) //converting array in Set removes duplicates
 
-const buildTree = (array) => {
-    if (!array.length) return null
-    const rootIndex = Math.floor(array.length / 2)
-    const root = Node(array[rootIndex])
-    root.left = buildTree(array.slice(0,rootIndex))
-    root.right = buildTree(array.slice(rootIndex+1))
-    return root
-}
-
-const array = [
-    42, -15, 73, 0, 88, -42, 15, 73, -88, 29,
-    -56, 56, 91, -91, 34, -34, 67, -67, 5, -5,
-    100, -100, 22, -22, 81, -81, 13, -13, 64, -64,
-    42, -15, 73, 0, 88, -42, 15, 73, -88, 29,
-    -56, 56, 91, -91, 34, -34, 67, -67, 5, -5
-  ];
+const array = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 35];
 
 const procesedArray = sortAndRemoveDuplicates(array)
 console.log(procesedArray)
 
 tree = Tree(procesedArray)
+tree.insert(29)
+tree.insert(30)
 prettyPrint(tree.root)
+
+/* tree.insert(0)
+prettyPrint(tree.root) */
+
+tree.deleteItem(9)
+prettyPrint(tree.root)
+
+console.log(tree.find(20))
