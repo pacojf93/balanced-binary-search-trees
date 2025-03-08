@@ -42,67 +42,66 @@ const Tree = (array) => {
       }
     })(root);
 
-    const deleteItem = (value) => {
-        const node = find(value)
-        if (node === null) return
+  const deleteItem = (value) => {
+    const node = find(value);
+    if (node === null) return;
 
-        //check if node is a leaf
-        if(node.left === null && node.right === null) {
-            //delete leaf
-            (findLeaf = function (node, parent = null) {
-                if(node.data === value) {
-                    if (parent.left !== null){
-                        if(parent.left.data === value) parent.left = null
-                    } else parent.right = null
-                    return
-                }
-                if (value > node.data) {
-                    if (node.right === null) return
-                    findLeaf(node.right, node)
-                } else {
-                    if (node.left === null) return
-                    findLeaf(node.left, node)
-                }
-            })(root)
+    //check if node is a leaf
+    if (node.left === null && node.right === null) {
+      //delete leaf
+      (findLeaf = function (node, parent = null) {
+        if (node.data === value) {
+          if (parent.left !== null) {
+            if (parent.left.data === value) parent.left = null;
+          } else parent.right = null;
+          return;
         }
-
-        //check if node has single child
-        if((node.left === null) !== (node.right === null)) {
-            //delete node and connect parent with child
-            (findSingleChild = function (node, parent = null) {
-                if(node.data === value) {
-                    if(parent.left.data === value) {
-                        if (node.left !== null) parent.left = node.left
-                        else parent.left = node.right
-                    } else {
-                        if (node.left !== null) parent.right = node.left
-                        else parent.right = node.right
-                    }
-                    return
-                }
-                if (value > node.data) {
-                    if (node.right === null) return
-                    findSingleChild(node.right, node)
-                } else {
-                    if (node.left === null) return
-                    findSingleChild(node.left, node)
-                }
-            })(root)
+        if (value > node.data) {
+          if (node.right === null) return;
+          findLeaf(node.right, node);
+        } else {
+          if (node.left === null) return;
+          findLeaf(node.left, node);
         }
-
-        //check if node has both children
-        if((node.left !== null) && (node.right !== null)) {
-            //find next bigger, delete it and put it in place
-            const nextBigger = (findNextBigger = function (node) {
-                if (node.left === null) return node
-                else return findNextBigger(node.left)
-            })(node.right)
-
-            deleteItem(nextBigger.data)
-            node.data = nextBigger.data           
-        }
-
+      })(root);
     }
+
+    //check if node has single child
+    if ((node.left === null) !== (node.right === null)) {
+      //delete node and connect parent with child
+      (findSingleChild = function (node, parent = null) {
+        if (node.data === value) {
+          if (parent.left.data === value) {
+            if (node.left !== null) parent.left = node.left;
+            else parent.left = node.right;
+          } else {
+            if (node.left !== null) parent.right = node.left;
+            else parent.right = node.right;
+          }
+          return;
+        }
+        if (value > node.data) {
+          if (node.right === null) return;
+          findSingleChild(node.right, node);
+        } else {
+          if (node.left === null) return;
+          findSingleChild(node.left, node);
+        }
+      })(root);
+    }
+
+    //check if node has both children
+    if (node.left !== null && node.right !== null) {
+      //find next bigger, delete it and put it in place
+      const nextBigger = (findNextBigger = function (node) {
+        if (node.left === null) return node;
+        else return findNextBigger(node.left);
+      })(node.right);
+
+      deleteItem(nextBigger.data);
+      node.data = nextBigger.data;
+    }
+  };
 
   const find = (value) =>
     (findRec = function (node) {
