@@ -75,13 +75,59 @@ const Tree = (array) => {
             else return node.left === null ? null : findRec(node.left)
         })(root)
 
+        const levelOrder = callBack => 
+            (levelOrderRec = function (queue) {
+                if(!queue.length) return
+                const node = queue[0]
+                callBack(node)
+                let newQueue = queue.slice(1, queue.length)
+                if (node.left !== null) newQueue = [...newQueue, node.left]
+                if (node.right !== null) newQueue = [...newQueue, node.right]
+                levelOrderRec(newQueue)
+            })([root])
+
+        const inOrder = callBack => 
+            (inOrderRec = function (node) {
+                if(node.left !== null) inOrderRec(node.left)
+                callBack (node)
+                if(node.right !== null) inOrderRec(node.right)
+            })(root)
+
+        const preOrder = callBack => 
+            (preOrderRec = function (node) {
+                callBack (node)
+                if(node.left !== null) preOrderRec(node.left)                
+                if(node.right !== null) preOrderRec(node.right)
+            })(root)
+
+        const postOrder = callBack => 
+            (postOrderRec = function (node) {
+                if(node.left !== null) postOrderRec(node.left)
+                if(node.right !== null) postOrderRec(node.right)
+                callBack (node)    
+            })(root)
+
+/*     const levelOrder = callBack => 
+        (levelOrderRec = function (queue) {
+            if(!queue.length) return
+            const node = queue.shift()
+            callBack(node)
+            if (node.left !== null) queue.push(node.left)
+            if (node.right !== null) queue.push(node.right)
+            levelOrderRec(queue)
+        })([root])    */
+
     const root = buildTree(array)
 
     return {
         root,
         insert,
         deleteItem,
-        find
+        find,
+        levelOrder,
+        inOrder,
+        preOrder,
+        postOrder
     }
 }
 
@@ -116,4 +162,6 @@ prettyPrint(tree.root) */
 tree.deleteItem(9)
 prettyPrint(tree.root)
 
-console.log(tree.find(20))
+//console.log(tree.find(20))
+
+tree.preOrder(node => console.log(node.data))
