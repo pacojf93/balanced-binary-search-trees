@@ -5,6 +5,10 @@ const Node = (data = null, left = null, right = null) => ({
 });
 
 const Tree = (array) => {
+    const sortAndRemoveDuplicates = (array) =>
+        [...new Set(array)].sort((a, b) => a - b); //converting array in Set removes duplicates
+
+
   const buildTree = (array) => {
     if (!array.length) return null;
     const rootIndex = Math.floor(array.length / 2);
@@ -116,17 +120,47 @@ const Tree = (array) => {
     })(root);
   };
 
-  /*     const levelOrder = callBack => 
-        (levelOrderRec = function (queue) {
-            if(!queue.length) return
-            const node = queue.shift()
-            callBack(node)
-            if (node.left !== null) queue.push(node.left)
-            if (node.right !== null) queue.push(node.right)
-            levelOrderRec(queue)
-        })([root])    */
+  const height = (node) =>
+    (heightRec = function (level, edges) {
+      let nextLevel = [];
+      level.forEach((node) => {
+        if (node.left !== null) nextLevel = [...nextLevel, node.left];
+        if (node.right !== null) nextLevel = [...nextLevel, node.right];
+      });
+      if (!nextLevel.length) return edges;
+      else return heightRec(nextLevel, edges + 1);
+    })([node], 0);
 
-  const root = buildTree(array);
+  const depth = (node) =>
+    (depthRec = function (level, edges) {
+      if (!level.length) return null;
+      if (level.includes(node)) return edges;
+      else {
+        let nextLevel = [];
+        level.forEach((node) => {
+          if (node.left !== null) nextLevel = [...nextLevel, node.left];
+          if (node.right !== null) nextLevel = [...nextLevel, node.right];
+        });
+        return depthRec(nextLevel, edges + 1);
+      }
+    })([root], 0);
+
+  const isBalanced = () =>
+    (isBalancedRec = function (node) {
+      let leftHeight = 0;
+      let rightHeight = 0;
+      if (node.left !== null) leftHeight = 1 + height(node.left);
+      if (node.right !== null) rightHeight = 1 + height(node.right);
+
+      if (Math.abs(leftHeight - rightHeight) > 1) return false;
+      else return true || isBalanced(node.left) || isBalanced(node.right);
+    })(root);
+
+    const rebalance = () => {
+
+        }
+
+  let root = buildTree(sortAndRemoveDuplicates(array));
 
   return {
     root,
@@ -137,6 +171,10 @@ const Tree = (array) => {
     inOrder,
     preOrder,
     postOrder,
+    height,
+    depth,
+    isBalanced,
+    rebalance,
   };
 };
 
@@ -153,21 +191,24 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
-const sortAndRemoveDuplicates = (array) =>
-  [...new Set(array)].sort((a, b) => a - b); //converting array in Set removes duplicates
-
 const array = [
   1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
   23, 24, 25, 26, 27, 28, 35,
 ];
 
-const procesedArray = sortAndRemoveDuplicates(array);
-console.log(procesedArray);
+tree = Tree(array);
 
-tree = Tree(procesedArray);
+console.log(
+  tree.isBalanced() ? "the tree is balanced" : "the tree is not balanced"
+);
+
 tree.insert(29);
 tree.insert(30);
 prettyPrint(tree.root);
+
+console.log(
+  tree.isBalanced() ? "the tree is balanced" : "the tree is not balanced"
+);
 
 /* tree.insert(0)
 prettyPrint(tree.root) */
@@ -178,3 +219,7 @@ prettyPrint(tree.root);
 //console.log(tree.find(20))
 
 tree.levelOrder((node) => console.log(node.data));
+
+node = tree.find(16);
+console.log(`depth of ${node.data} is ${tree.depth(node)}`);
+console.log(`height of ${node.data} is ${tree.height(node)}`);
