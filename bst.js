@@ -5,9 +5,21 @@ const Node = (data = null, left = null, right = null) => ({
 });
 
 const Tree = (array) => {
-    const sortAndRemoveDuplicates = (array) =>
-        [...new Set(array)].sort((a, b) => a - b); //converting array in Set removes duplicates
+  const prettyPrint = (node, prefix = "", isLeft = true) => {
+    if (node === null) {
+      return;
+    }
+    if (node.right !== null) {
+      prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
+    }
+    console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
+    if (node.left !== null) {
+      prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+    }
+  };
 
+  const sortAndRemoveDuplicates = (array) =>
+    [...new Set(array)].sort((a, b) => a - b); //converting array in Set removes duplicates
 
   const buildTree = (array) => {
     if (!array.length) return null;
@@ -156,14 +168,16 @@ const Tree = (array) => {
       else return true || isBalanced(node.left) || isBalanced(node.right);
     })(root);
 
-    const rebalance = () => {
-
-        }
+  const rebalance = () => {
+    const newArray = [];
+    inOrder((node) => newArray.push(node.data));
+    root = buildTree(sortAndRemoveDuplicates(newArray));
+  };
 
   let root = buildTree(sortAndRemoveDuplicates(array));
 
   return {
-    root,
+    root: () => root,
     insert,
     deleteItem,
     find,
@@ -175,51 +189,8 @@ const Tree = (array) => {
     depth,
     isBalanced,
     rebalance,
+    print: () => prettyPrint(root),
   };
 };
 
-const prettyPrint = (node, prefix = "", isLeft = true) => {
-  if (node === null) {
-    return;
-  }
-  if (node.right !== null) {
-    prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
-  }
-  console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
-  if (node.left !== null) {
-    prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
-  }
-};
-
-const array = [
-  1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-  23, 24, 25, 26, 27, 28, 35,
-];
-
-tree = Tree(array);
-
-console.log(
-  tree.isBalanced() ? "the tree is balanced" : "the tree is not balanced"
-);
-
-tree.insert(29);
-tree.insert(30);
-prettyPrint(tree.root);
-
-console.log(
-  tree.isBalanced() ? "the tree is balanced" : "the tree is not balanced"
-);
-
-/* tree.insert(0)
-prettyPrint(tree.root) */
-
-tree.deleteItem(9);
-prettyPrint(tree.root);
-
-//console.log(tree.find(20))
-
-tree.levelOrder((node) => console.log(node.data));
-
-node = tree.find(16);
-console.log(`depth of ${node.data} is ${tree.depth(node)}`);
-console.log(`height of ${node.data} is ${tree.height(node)}`);
+module.exports = Tree;
